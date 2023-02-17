@@ -64,17 +64,16 @@ YARPGEN_OPTIONS="-m 32"
 
 ## More details
 
- Testfiles are created in a subdirectory of XDG_RUNTIME_DIR </b>
- (which is normally a RAM-disc, based on tmpfs). </br>
- This is much faster and avoids write pressure on a physical disc (probably a flash disc).
+ * Testfiles are created in a subdirectory of XDG_RUNTIME_DIR </b>
+   (which is normally a RAM-disc, based on tmpfs). </br>
+   This is much faster and avoids write pressure on a physical disc (probably a flash disc).
 
- When building or running a test binary or comparing the result fails, </br>
- additional shell scripts are created, which can be used to rebuild and run/diff the programs<br>
- A script to be used for reducing failed tests is missing.
+ * When building or running a test binary or comparing the result fails, </br>
+   additional shell scripts are created, which can be used to rebuild and run/diff the programs. <br>
 
- To avoid to fill up the disc, all files for the current seed value are deleted, </br>
- when both compile variants work and running the created programs produced the same result.
+ * To avoid to fill up the RAM-disc, all files for the current seed value are deleted, </br>
+   when both compile variants work and running the created programs produced the same result.
 
- The output of this script is compatible to TAP: Test Anything Protocol
+ * The output of this script is compatible to [TAP: Test Anything Protocol](https://testanything.org)
  
- LICENSE: MIT
+ * LICENSE: MIT
