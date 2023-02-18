@@ -24,6 +24,8 @@
  * YARPGEN_BIN     use a different YARPGen binary
  * YARPGEN_OPTIONS use additional options for yarpgen
  * RUNTIME_DIR     use this directory as working directory [ $XDG_RUNTIME_DIR/subdir | /tmp/$subdir ]
+ * OPTIMIZE        call the test compiler for every entry in OPTIMIZE
+
 
  * REFCC           c reference compiler  [ \$HOSTCC | \$BUILDCC | $def_refcc ]
  * REFCXX          c++ reference compiler[ \$HOSTCXX | \$BUILDCXX | $def_refcxx ]
@@ -40,6 +42,9 @@ As example, when creating testfiles for a 32bit compiler, yarpgen (v1) needs
 ```
 YARPGEN_OPTIONS="-m 32" 
 ```
+
+The first entry in \$OPTIMIZE is also used for the reference compiler
+
 
 ## The scriptname can select the versions (yarpgen & std) and the reference compiler (binary & flags)
 
@@ -64,14 +69,14 @@ YARPGEN_OPTIONS="-m 32"
 
 ## More details
 
- * Testfiles are created in a subdirectory of XDG_RUNTIME_DIR </b>
+ * Testfiles are created in a subdirectory of $XDG_RUNTIME_DIR </br>
    (which is normally a RAM-disc, based on tmpfs). </br>
    This is much faster and avoids write pressure on a physical disc (probably a flash disc).
 
- * When building or running a test binary or comparing the result fails, </br>
-   additional shell scripts are created, which can be used to rebuild and run/diff the programs. <br>
+ * When building or running a test binary or comparing the result fails,</br>
+   additional shell scripts are created, which can be used to rebuild and run/diff the programs.</br>
 
- * To avoid to fill up the RAM-disc, all files for the current seed value are deleted, </br>
+ * To avoid to fill up the RAM-disc, all files for the current seed value are deleted,</br>
    when both compile variants work and running the created programs produced the same result.
 
  * The output of this script is compatible to [TAP: Test Anything Protocol](https://testanything.org)

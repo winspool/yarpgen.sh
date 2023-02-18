@@ -18,6 +18,7 @@
 ## YARPGEN_BIN     a different yarpgen binary [ $YARPGEN_BIN ]
 ## YARPGEN_OPTIONS additional options for yarpgen
 ## RUNTIME_DIR     working directory     [ \$XDG_RUNTIME_DIR/$subdir | /tmp/$subdir ]
+## OPTIMIZE        call the test compiler for every entry in OPTIMIZE
 ##
 ## REFCC           c reference compiler  [ \$HOSTCC | \$BUILDCC | $def_refcc ]
 ## REFCXX          c++ reference compiler[ \$HOSTCXX | \$BUILDCXX | $def_refcxx ]
@@ -446,6 +447,7 @@ DEBUG           print many extra informations
 YARPGEN_BIN     a different yarpgen binary [ $YARPGEN_BIN ]
 YARPGEN_OPTIONS additional options for running $YARPGEN_BIN
 RUNTIME_DIR     working directory     [ \$XDG_RUNTIME_DIR/$subdir | /tmp/$subdir ]
+OPTIMIZE        call the test compiler for every entry in OPTIMIZE
 
 REFCC           c reference compiler  [ \$HOSTCC | \$BUILDCC | $def_refcc ]
 REFCXX          c++ reference compiler[ \$HOSTCXX | \$BUILDCXX | $def_refcxx ]
