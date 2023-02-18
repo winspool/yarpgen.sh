@@ -280,13 +280,15 @@ fi
 
 COMPILER_FLAGS=" $compiler_set_std  $def_debug $def_warn "
 
-# test at least our default optimize flag
-if [  -z "$OPTIMIZE" ]
+# test at least with our default optimize flag
+OPTIMIZE="$OPTIMIZE $def_opt"
+
+ref_opt="`echo $OPTIMIZE | cut -d " " -f1 `"
+if [  -z "$ref_opt" ]
 then
-    OPTIMIZE="$def_opt"
+    ref_opt="$def_opt"
 fi
 
-ref_opt="$def_opt"
 
 # cleanup working directory (default: no cleanup)
 cleanup_dir=""
