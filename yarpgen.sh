@@ -777,50 +777,44 @@ do
 
 
                 echo  >"$RUNTIME_DIR""/$seed_id""/gen.sh" "#!/bin/sh"
-                echo >>"$RUNTIME_DIR""/$seed_id""/gen.sh" "$YARPGEN_BIN $yarpgen_set_std $YARPGEN_OPTIONS -s $seed_num --out-dir=""./"
+                echo >>"$RUNTIME_DIR""/$seed_id""/gen.sh" "$YARPGEN_BIN $yarpgen_set_std $YARPGEN_OPTIONS ""$""YARPGEN_OPTIONS -s $seed_num --out-dir=""./"
 
                 chmod a+x "$RUNTIME_DIR""/$seed_id""/gen.sh"
 
 
-                echo  >"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "#!/bin/sh"
-                echo >>"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "rm 2>""/dev/null driver.o func.o  ref"$ref_opt  " ref"$ref_opt".txt"
-                echo >>"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS driver$srcext -c  -o driver.o"
-                echo >>"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS func$srcext   -c  -o func.o"
-                echo >>"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS driver.o   func.o  -o ref"$ref_opt
+                echo  >"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "#!/bin/sh"
+                echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "rm 2>""/dev/null driver.o func.o  ref"$ref_opt  " ref"$ref_opt".txt"
+                echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS driver$srcext -c  -o driver.o"
+                echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS func$srcext   -c  -o func.o"
+                echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS driver.o   func.o  -o ref"$ref_opt
                 if [ -n "$debug_me" ]
                 then
-                    echo  >"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "size ref"$ref_opt
+                    echo  >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "size ref"$ref_opt
                 fi
+                chmod a+x "$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh"
 
-                chmod a+x "$RUNTIME_DIR""/$seed_id""/ref_cc.sh"
 
-
-                echo  >"$RUNTIME_DIR""/$seed_id""/tst_cc.sh" "#!/bin/sh"
-                echo >>"$RUNTIME_DIR""/$seed_id""/tst_cc.sh" "rm 2>""/dev/null driver.o func.o  tst"$tst_opt " tst"$tst_opt".txt"
-                echo >>"$RUNTIME_DIR""/$seed_id""/tst_cc.sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS driver$srcext -c  -o driver.o"
-                echo >>"$RUNTIME_DIR""/$seed_id""/tst_cc.sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS func$srcext   -c  -o func.o"
-                echo >>"$RUNTIME_DIR""/$seed_id""/tst_cc.sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS driver.o   func.o  -o tst"$tst_opt
+                echo  >"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "#!/bin/sh"
+                echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "rm 2>""/dev/null driver.o func.o  tst"$tst_opt " tst"$tst_opt".txt"
+                echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS driver$srcext -c  -o driver.o"
+                echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS func$srcext   -c  -o func.o"
+                echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS driver.o   func.o  -o tst"$tst_opt
                 if [ -n "$debug_me" ]
                 then
-                    echo  >"$RUNTIME_DIR""/$seed_id""/ref_cc.sh" "size tst"$tst_opt
+                    echo  >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "size tst"$tst_opt
                 fi
-
-                chmod a+x "$RUNTIME_DIR""/$seed_id""/tst_cc.sh"
+                chmod a+x "$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh"
 
 
                 echo  >"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "#!/bin/sh"
-                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" ". ref_cc.sh"
-                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" ". tst_cc.sh"
-                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "ref"$ref_opt  ">ref"$ref_opt".txt"
-                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "tst"$tst_opt  ">tst"$tst_opt".txt"
+                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "./ref$ref_opt"".sh"
+                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "./tst$tst_opt"".sh"
+                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "./ref"$ref_opt  ">ref"$ref_opt".txt"
+                echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "./tst"$tst_opt  ">tst"$tst_opt".txt"
                 echo >>"$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh" "diff -u  ref"$ref_opt".txt  tst"$tst_opt".txt"
 
                 chmod a+x  "$RUNTIME_DIR""/$seed_id""/diff$tst_opt"".sh"
 
-                if [ -n "$debug_me" ]
-                then
-                    ls 2>/dev/null -al "$RUNTIME_DIR""/*.$srcext" "$RUNTIME_DIR""/*.h" "$RUNTIME_DIR""/*.o" "$RUNTIME_DIR""/*ref*" "$RUNTIME_DIR""/*tst*"  "$RUNTIME_DIR""/$seed_id""_*"  "$RUNTIME_DIR""/$seed_id"
-                fi
             fi
 
 
