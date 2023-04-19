@@ -110,9 +110,13 @@ def_warn="-w "
 def_refcc="gcc"
 def_refcxx="g++"
 
-# timeout for running the compiled programm
-def_timeout="8"
+# timeout for compiling / running the compiled programm
+cc_timeout="240"
+run_timeout="15"
 
+# when your system gets too hot and reduces the processor clock,
+# it might be faster to use a short sleep after testing a seed
+#cooldown_sleep="1"
 
 # all configuration options are above #
 #######################################
@@ -260,21 +264,21 @@ then
     compiler_set_std="-std=$c_or_cxx$std_version"
 
     # yarpgen v1 uses the full version, but yarpgen(master) uses only the language (c/c++)
-    if [ -z "$yarpgen_version" ]
+    if [ "x$yarpgen_version" = "x1" ]
     then
-        yarpgen_set_std="--std=c"
-    else
         yarpgen_set_std="--std=c$std_version"
+    else
+        yarpgen_set_std="--std=c"
     fi
 else
     srcext="$cxxext"
     compiler_set_std="-std=$c_or_cxx$std_version"
     # yarpgen v1 uses the full version, but yarpgen(master) uses only the language (c/c++)
-    if [ -z "$yarpgen_version" ]
+    if [ "x$yarpgen_version" = "x1" ]
     then
-        yarpgen_set_std="--std=c++"
-    else
         yarpgen_set_std="--std=c++$std_version"
+    else
+        yarpgen_set_std="--std=c++"
     fi
 fi
 
@@ -548,8 +552,8 @@ echo "# using reference compiler:  $REFCC$REFCXX"
 echo "# using reference flags:     $REFCCFLAGS$REFCXXFLAGS"
 echo "# using testing compiler:    $TESTCC$TESTCXX"
 echo "# using testing flags:       $TESTCCFLAGS$TESTCXXFLAGS"
+echo "# using timeouts:            compile: $cc_timeout""sec, run: $run_timeout""sec"
 echo ""
-
 
 if [  -z "$OPTIMIZE" ]
 then
@@ -605,7 +609,7 @@ do
         then
             echo "# REF  compile: "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR/driver""$srcext" -c  -o "$RUNTIME_DIR""/driver.o"
         fi
-        $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR/driver""$srcext" -c  -o "$RUNTIME_DIR""/driver.o"
+        timeout  $cc_timeout $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR/driver""$srcext" -c  -o "$RUNTIME_DIR""/driver.o"
         if [ $? -ne 0 ]
         then
             need_ref="$ref_opt"
@@ -616,7 +620,7 @@ do
         then
             echo "# REF  compile: "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR/func""$srcext"   -c  -o "$RUNTIME_DIR""/func.o"
         fi
-        $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/func""$srcext"   -c  -o "$RUNTIME_DIR""/func.o"
+        timeout  $cc_timeout $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/func""$srcext"   -c  -o "$RUNTIME_DIR""/func.o"
         if [ $? -ne 0 ]
         then
             need_ref="$ref_opt"
@@ -627,7 +631,7 @@ do
         then
             echo "# REF  link:    "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt
         fi
-        $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt
+        timeout  $cc_timeout $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt
         if [ $? -ne 0 ]
         then
             need_ref="$ref_opt"
@@ -638,7 +642,7 @@ do
         then
             echo "# REF  run:    ""$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt  >"$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt".txt"
         fi
-        timeout  2>/dev/null  $def_timeout "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt  >"$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt".txt"
+        timeout  $run_timeout "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt  >"$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt".txt"
         if [ $? -ne 0 ]
         then
             need_ref="$ref_opt"
@@ -666,7 +670,7 @@ do
             then
                 echo "# TST  compile: "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR/driver""$srcext" -c  -o "$RUNTIME_DIR""/driver.o"
             fi
-            $TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR/driver""$srcext" -c  -o "$RUNTIME_DIR""/driver.o"
+            timeout  $cc_timeout $TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR/driver""$srcext" -c  -o "$RUNTIME_DIR""/driver.o"
             if [ $? -ne 0 ]
             then
                 need_tst="$tst_opt"
@@ -676,7 +680,7 @@ do
             then
                 echo "# TST  compile: "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR/func""$srcext"   -c  -o "$RUNTIME_DIR""/func.o"
             fi
-            $TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR/func""$srcext"   -c  -o "$RUNTIME_DIR""/func.o"
+            timeout  $cc_timeout $TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR/func""$srcext"   -c  -o "$RUNTIME_DIR""/func.o"
             if [ $? -ne 0 ]
             then
                 need_tst="$tst_opt"
@@ -686,7 +690,7 @@ do
             then
                 echo "# TST  link:    "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt
             fi
-            $TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt
+            timeout  $cc_timeout $TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt
             if [ $? -ne 0 ]
             then
                 need_tst="$tst_opt"
@@ -694,10 +698,10 @@ do
 
             if [ -n "$debug_me" ]
             then
-                echo "# TST   run:    "timeout $def_timeout "$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt  >"$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt".txt"
+                echo "# TST   run:    ""$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt  >"$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt".txt"
 
             fi
-            timeout $def_timeout "$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt  >"$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt".txt"
+            timeout  $run_timeout "$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt  >"$RUNTIME_DIR""/""$seed_id""_tst"$tst_opt".txt"
             if [ $? -ne 0 ]
             then
                 need_tst="$tst_opt"
@@ -742,7 +746,7 @@ do
 
                 test_id=$(($test_id + 1))
                 echo "not ok # compile REF:"
-                echo "       # "  $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt
+                echo "       # " $REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS "$RUNTIME_DIR""/driver.o"  "$RUNTIME_DIR""/func.o"  -o "$RUNTIME_DIR""/""$seed_id""_ref"$ref_opt
                 n_fails=$((n_fails + 1))
                 f=$(($f + 1))
 
@@ -791,6 +795,7 @@ do
                 echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS driver$srcext -c  -o driver.o"
                 echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS func$srcext   -c  -o func.o"
                 echo >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "$REFCC$REFCXX $ref_opt $COMPILER_FLAGS $REFCCFLAGS$REFCXXFLAGS \$CFLAGS driver.o   func.o  -o ref"$ref_opt
+                echo >>"$RUNTIME_DIR""/$seed_id""/ref$tst_opt"".sh" "./ref"$ref_opt  ">ref"$ref_opt".txt"
                 if [ -n "$debug_me" ]
                 then
                     echo  >>"$RUNTIME_DIR""/$seed_id""/ref$ref_opt"".sh" "size ref"$ref_opt
@@ -803,6 +808,7 @@ do
                 echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS driver$srcext -c  -o driver.o"
                 echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS func$srcext   -c  -o func.o"
                 echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "$TESTCC$TESTCXX $tst_opt $COMPILER_FLAGS $TESTCCFLAGS$TESTCXXFLAGS \$CFLAGS driver.o   func.o  -o tst"$tst_opt
+                echo >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "./tst"$tst_opt  ">tst"$tst_opt".txt"
                 if [ -n "$debug_me" ]
                 then
                     echo  >>"$RUNTIME_DIR""/$seed_id""/tst$tst_opt"".sh" "size tst"$tst_opt
@@ -848,6 +854,13 @@ do
     if [ -n "$debug_me" ]
     then
         echo ""
+    fi
+
+#   when your system gets too hot and decrease processor clock,
+#   it might be faster to use a short sleep after testing a seed
+    if [ -n "$cooldown_sleep" ]
+    then
+        sleep "$cooldown_sleep"
     fi
 
 done
